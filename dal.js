@@ -1,12 +1,17 @@
 const MongoClient = require('mongodb').MongoClient;
-const url = 'mongodb://localhost:27017';
+const uri = require('./mongocreds').uri;
+const url = "mongodb://localhost:27017"
 var db = null;
 
 // connect to mongo
 MongoClient.connect(url, {useUnifiedTopology: true}, function(err, client){
+    if (err) {
+        console.log(err);
+        return
+    }
     console.log('Connected!')
 
-    //database name
+    //database name, change this to bankingusers when not using local mongodb
     const dbName = 'myproject';
     db = client.db(dbName);
 })
@@ -47,6 +52,9 @@ function login(email, password){
                     resolve(user)
                 }
             })
+            if (!loginSuccessful){
+                resolve({status: "NO_ACC"})
+            }
         }
         catch(error){
             console.log(error.message);
@@ -116,4 +124,84 @@ function deposit(email, amount) {
     })
 }
 
-module.exports = {create, all, login, withdraw, deposit};
+// give admin role
+function giveAdmin(email){
+    return new Promise(async (resolve, reject) => {
+        const query = db.collection('users').findOne({email: email})
+        let user = await query;
+
+        try {
+            if (!user) {
+                resolve({status: 'NO_ACC'});
+                return;
+            }
+            else if (user.isAdmin) {
+                resolve({status: 'IS_ADMIN'})
+                return;
+            }
+            else{
+                const result = await db.collection('users').updateOne({email: email}, { $set : {isAdmin: true}})
+                    .then(() => {
+                        resolve({status: 'SUCC'})
+                    })
+            }
+        }
+        catch(error){
+            reject(error);
+        }
+    })
+}
+
+// take away admin role
+function removeAdmin(email){
+    return new Promise(async (resolve, reject) => {
+        const query = db.collection('users').findOne({email: email})
+        let user = await query;
+
+        try {
+            if (!user || user.name == 'solomon@email.com') {
+                resolve({status: 'NO_ACC'});
+                return;
+            }
+            else if (!user.isAdmin) {
+                resolve({status: 'NOT_ADMIN'})
+                return;
+            }
+            else{
+                const result = await db.collection('users').updateOne({email: email}, { $set : {isAdmin: false}})
+                    .then(() => {
+                        resolve({status: 'SUCC'})
+                    })
+            }
+        }
+        catch(error){
+            reject(error);
+        }
+    })
+}
+
+// adjust balance
+function adjustBalance(email, amount){
+    return new Promise(async (resolve, reject) => {
+        const query = db.collection('users').findOne({email: email})
+        let user = await query;
+
+        amount = parseInt(amount);
+
+        try {
+            if (amount <= 0 || isNaN(amount)) {
+                resolve({status: 'BAD_NUM'})
+            }
+            else {
+                const result = await db.collection('users').updateOne({email: email}, { $set : {balance: amount}}).then(() => {
+                    resolve({status: 'SUCC'});
+                });
+            }
+        }
+        catch(error){
+            reject(error)
+        }
+    })
+}
+
+module.exports = {create, all, login, withdraw, deposit, giveAdmin, removeAdmin, adjustBalance};

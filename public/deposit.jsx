@@ -30,18 +30,22 @@ function Deposit(){
     })
 
     return(
-        <React.Fragment>
+        <div style={{padding:'2rem'}}>
         <Card
-            bgcolor='primary'
             header='Deposit'
+            style={{
+                    backgroundColor: "#466362",
+                    padding: "1rem",
+                    maxWidth: "50rem",
+                }}
             body={ctx.loggedIn && (
                 <React.Fragment>
                     Balance {balance}
-                    <input type='number' className='form-control' id='deposit' value={amount} onChange={(e) => setAmount(Number(e.target.value))}/>
+                    <input type='number' className='form-control' id='deposit' value={amount} placeholder='Deposit Amount' onChange={(e) => setAmount(Number(e.target.value))}/>
                     <button type='submit' className='btn btn-light' onClick={handleSubmit} disabled={disabled}>Deposit</button>
                 </React.Fragment>
             )}
         />
-        </React.Fragment>
+        </div>
     )
 }

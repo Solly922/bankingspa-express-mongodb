@@ -30,10 +30,14 @@ function Withdraw(){
     })
 
     return(
-        <React.Fragment>
+        <div style={{padding: '2rem'}}>
         <Card
-            bgcolor='primary'
             header='Withdraw'
+            style={{
+                    backgroundColor: "#466362",
+                    padding: "1rem",
+                    maxWidth: "50rem",
+                }}
             body={ctx.loggedIn && (
                 <React.Fragment>
                     Balance {balance}
@@ -42,6 +46,6 @@ function Withdraw(){
                 </React.Fragment>
             )}
         />
-        </React.Fragment>
+        </div>
     )
 }

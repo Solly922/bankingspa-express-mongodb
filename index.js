@@ -1,7 +1,8 @@
 var express = require('express');
 var app = express();
 var cors = require('cors');
-var dal = require('./dal')
+var dal = require('./dal');
+const { response } = require('express');
 
 // serve static files from public directory
 app.use(express.static('public'));
@@ -49,6 +50,33 @@ app.get('/account/deposit/:email/:amount', (req, res) => {
         .then(balance => {
             console.log('express: balance: ' + balance);
             res.send({balance: balance});
+        })
+})
+
+// give admin
+app.get('/account/giveadmin/:email', (req, res) => {
+    dal.giveAdmin(req.params.email)
+        .then(response => {
+            console.log(response);
+            res.send(response)
+        })
+})
+
+// remove admin
+app.get('/account/removeadmin/:email', (req, res) => {
+    dal.removeAdmin(req.params.email)
+        .then(response => {
+            console.log(response);
+            res.send(response)
+        })
+})
+
+// edit balance of user
+app.get('/account/adjust/:email/:amount', (req, res) => {
+    dal.adjustBalance(req.params.email, req.params.amount)
+        .then(response => {
+            console.log(response);
+            res.send(response);
         })
 })
 
