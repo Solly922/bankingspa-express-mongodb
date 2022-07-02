@@ -12,8 +12,14 @@ function AllData(){
     })
 
     return(
-        <h1>All Data in Store<br/>
-            {data}
+        <h1 style={{
+            backgroundColor: '#c5d5e4',
+            opacity: '0.7',
+            maxWidth: '75%',
+            overflowWrap: 'break-word',
+            margin: 'auto'
+        }}>All Data in Store<br/>
+            {ctx.account.isAdmin && data}
             {JSON.stringify(ctx)}
         </h1>
     )
